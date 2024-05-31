@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Attendance</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="./photos/Unknown.png" alt="Logo" class="logo">
+            <h2>View Attendance</h2>
+        </header>
+        <table id="attendance-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Roll Number</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Attendance records will be listed here -->
+            </tbody>
+        </table>
+        <!-- Add a button to trigger clearing attendance records -->
+        <button id="clear-attendance-btn">Clear Attendance Records</button>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Select the <tbody> element where attendance records are listed
+            const attendanceTableBody = document.querySelector('#attendance-table tbody');
+
+            // Function to clear all attendance records
+            function clearAttendanceRecords() {
+                // Remove all child elements of the tbody
+                while (attendanceTableBody.firstChild) {
+                    attendanceTableBody.removeChild(attendanceTableBody.firstChild);
+                }
+            }
+
+            // Add event listener to the button to clear attendance records
+            const clearAttendanceBtn = document.getElementById('clear-attendance-btn');
+            clearAttendanceBtn.addEventListener('click', clearAttendanceRecords);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

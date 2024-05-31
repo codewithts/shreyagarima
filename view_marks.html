@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Student Marks</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .student-marks {
+            margin-bottom: 20px;
+        }
+
+        .student-marks h3 {
+            margin-bottom: 5px;
+        }
+
+        .student-marks p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="./photos/Unknown.png" alt="Logo" class="logo">
+            <h1>View Student Marks</h1>
+        </header>
+        <div id="marks-list"></div>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        // Function to fetch saved student marks from localStorage
+        function loadStudentMarks() {
+            return JSON.parse(localStorage.getItem('studentMarks')) || [];
+        }
+
+        // Function to generate HTML for displaying student marks
+        function renderStudentMarks() {
+            const studentMarks = loadStudentMarks();
+            const marksList = document.getElementById('marks-list');
+            marksList.innerHTML = '';
+            studentMarks.forEach((marks, index) => {
+                const markRow = `
+                    <div class="student-marks">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="2">${marks.studentName}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Subject:</td>
+                                    <td>${marks.subject}</td>
+                                </tr>
+                                <tr>
+                                    <td>Marks:</td>
+                                    <td>${marks.marks.join(', ')}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Marks:</td>
+                                    <td>${marks.totalMarks}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                marksList.insertAdjacentHTML('beforeend', markRow);
+            });
+        }
+
+        // Load student marks and render them on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudentMarks();
+        });
+    </script>
+</body>
+</html>
+
+
+               
+

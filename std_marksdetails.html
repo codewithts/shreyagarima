@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Student Internals</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="./photos/Unknown.png" alt="Logo" class="logo">
+            <h1>Enter Student Internals</h1>
+        </header>
+        <form id="internals-form">
+            <div>
+                <label for="subject">Subject Name:</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+            <table id="internals-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Component 1</th>
+                        <th>Component 2</th>
+                        <th>Component 3</th>
+                        <th>Component 4</th>
+                        <th>Total Marks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row for each student will be added by JavaScript -->
+                </tbody>
+            </table>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        // Function to fetch student names from localStorage
+        function loadStudents() {
+            return JSON.parse(localStorage.getItem('students')) || [];
+        }
+
+        // Function to add rows for each student in the table
+        function renderStudentsTable() {
+            const students = loadStudents();
+            const tableBody = document.querySelector('#internals-table tbody');
+            tableBody.innerHTML = '';
+            students.forEach((student, index) => {
+                const row = `
+                    <tr>
+                        <td>${student.name}</td>
+                        <td><input type="number" value="0" min="0" max="10" step="1" name="marks${index}_1" onchange="calculateTotalMarks(${index})"></td>
+                        <td><input type="number" value="0" min="0" max="10" step="1" name="marks${index}_2" onchange="calculateTotalMarks(${index})"></td>
+                        <td><input type="number" value="0" min="0" max="10" step="1" name="marks${index}_3" onchange="calculateTotalMarks(${index})"></td>
+                        <td><input type="number" value="0" min="0" max="10" step="1" name="marks${index}_4" onchange="calculateTotalMarks(${index})"></td>
+                        <td><input type="number" value="0" min="0" max="40" step="1" name="total${index}" readonly></td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // Function to calculate total marks for each student
+        function calculateTotalMarks(studentIndex) {
+            let total = 0;
+            for (let i = 1; i <= 4; i++) {
+                const marks = parseFloat(document.querySelector(`input[name="marks${studentIndex}_${i}"]`).value);
+                total += marks;
+            }
+            document.querySelector(`input[name="total${studentIndex}"]`).value = total;
+        }
+
+        // Load student names and render table on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudentsTable();
+        });
+
+        // Function to save student marks to localStorage
+        function saveStudentMarks() {
+            const students = loadStudents();
+            const marks = [];
+            const subject = document.getElementById('subject').value;
+            students.forEach((student, index) => {
+                const subjectMarks = [];
+                for (let i = 1; i <= 4; i++) {
+                    const marksInput = parseFloat(document.querySelector(`input[name="marks${index}_${i}"]`).value);
+                    subjectMarks.push(marksInput);
+                }
+                const totalMarks = subjectMarks.reduce((acc, curr) => acc + curr, 0);
+                marks.push({ studentName: student.name, subject, marks: subjectMarks, totalMarks });
+            });
+            localStorage.setItem('studentMarks', JSON.stringify(marks));
+        }
+
+        // Event listener for form submission
+        document.getElementById('internals-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            saveStudentMarks();
+            // Redirect to view marks page after saving marks
+            window.location.href = 'view_marks.html';
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

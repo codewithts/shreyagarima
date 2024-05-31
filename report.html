@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Report</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> <!-- Add Chart.js CDN -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="./photos/Unknown.png" alt="Logo" class="logo">
+            <h2>Attendance Report</h2>
+        </header>
+        <div class="chart-container">
+            <canvas id="attendance-chart"></canvas> <!-- Canvas for Chart.js graph -->
+        </div>
+        <table id="report-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Roll Number</th>
+                    <th>Days Present</th>
+                    <th>Days Absent</th>
+                    <th>Attendance Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Attendance report will be listed here -->
+            </tbody>
+        </table>
+        <div class="stats">
+            <p>Highest Attendance: <span id="highest-attendance"></span>%</p>
+            <p>Lowest Attendance: <span id="lowest-attendance"></span>%</p>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        // JavaScript code for generating attendance report and chart
+        document.addEventListener("DOMContentLoaded", () => {
+            const reportTableBody = document.getElementById('report-table')?.querySelector('tbody');
+
+            // Load attendance from localStorage
+            function loadAttendance() {
+                const attendance = JSON.parse(localStorage.getItem('attendance')) || [];
+                return attendance;
+            }
+
+            // Load students from localStorage
+            function loadStudents() {
+                const students = JSON.parse(localStorage.getItem('students')) || [];
+                return students;
+            }
+
+            // Generate attendance report
+            function generateReport() {
+                const attendance = loadAttendance();
+                const students = loadStudents();
+
+                const report = students.map(student => {
+                    const studentAttendance = attendance.filter(record => record.rollNumber === student.rollNumber);
+                    const daysPresent = studentAttendance.filter(record => record.status === 'Present').length;
+                    const daysAbsent = studentAttendance.filter(record => record.status === 'Absent').length;
+                    const totalDays = daysPresent + daysAbsent;
+                    const attendancePercentage = totalDays === 0 ? 0 : Math.round((daysPresent / totalDays) * 100);
+                    return { ...student, daysPresent, daysAbsent, attendancePercentage };
+                });
+
+                // Sort report by attendance percentage
+                report.sort((a, b) => b.attendancePercentage - a.attendancePercentage);
+
+                // Update table and statistics
+                if (reportTableBody) {
+                    reportTableBody.innerHTML = report.map(record => `
+                        <tr>
+                            <td>${record.name}</td>
+                            <td>${record.rollNumber}</td>
+                            <td>${record.daysPresent}</td>
+                            <td>${record.daysAbsent}</td>
+                            <td>${record.attendancePercentage}%</td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Update highest and lowest attendance
+                const highestAttendance = report[0]?.attendancePercentage || 0;
+                const lowestAttendance = report[report.length - 1]?.attendancePercentage || 0;
+                document.getElementById('highest-attendance').textContent = highestAttendance;
+                document.getElementById('lowest-attendance').textContent = lowestAttendance;
+
+                // Generate chart
+                generateChart(report);
+            }
+
+            // Function to generate the attendance chart
+            function generateChart(report) {
+                const labels = report.map(record => record.name);
+                const data = report.map(record => record.attendancePercentage);
+                
+                const ctx = document.getElementById('attendance-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Attendance Percentage',
+                            data: data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Attendance Percentage'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Students'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Call generateReport function on page load
+            generateReport();
+        });
+    </script>
+</body>
+</html>
+
